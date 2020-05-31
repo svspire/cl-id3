@@ -245,9 +245,10 @@
     (read-value 'id3-tag in)))
 
 (defun show-tag-header (file)
-  (with-slots (identifier major-version revision flags size) (read-id3 file)
-    (format t "~a ~d.~d ~8,'0b ~d bytes -- ~a~%"
-            identifier major-version revision flags size (enough-namestring file))))
+  (handler-case (with-slots (identifier major-version revision flags size) (read-id3 file)
+                  (format t "~a ~d.~d ~8,'0b ~d bytes -- ~a~%"
+                          identifier major-version revision flags size (enough-namestring file)))
+    (error ()  (format t "Parsing error -- ~a~%" (enough-namestring file)))))
 
 (defun show-tag-headers (dir) 
   (walk-directory dir #'show-tag-header :test #'mp3-p))
